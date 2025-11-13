@@ -7,7 +7,7 @@ const Sidebar = () => {
   const isActive = (path) =>
     pathname === path
       ? "bg-[#c7243b] text-white shadow-sm"
-      : "text-white hover:bg-white/10";
+      : "text-black hover:bg-black/10";
 
   return (
     <aside className="h-screen w-60 bg-[#ffffff] text-black flex flex-col sticky top-0">
