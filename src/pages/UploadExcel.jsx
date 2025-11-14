@@ -968,49 +968,108 @@ const UploadExcel = () => {
                     </div>
                   </div>
 
-                  {/* Summary table if available */}
-                  {tableCharts.length > 0 && tableCharts[0] && (
-                    <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100">
-                      <h3 className="text-lg font-bold text-gray-800 mb-4">
-                        {tableCharts[0].title || "Summary Statistics"}
-                      </h3>
-                      <div className="overflow-x-auto custom-scrollbar">
-                        <table className="min-w-full text-xs border-collapse">
-                          <thead>
-                            <tr className="bg-gray-50">
-                              {tableCharts[0].data.headers.map((h, i) => (
-                                <th
-                                  key={i}
-                                  className="border border-gray-200 px-3 py-2 text-left font-semibold text-gray-700"
-                                >
-                                  {h}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {tableCharts[0].data.rows.map((row, rIdx) => (
-                              <tr
-                                key={rIdx}
-                                className={
-                                  rIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                }
-                              >
-                                {row.map((cell, cIdx) => (
-                                  <td
-                                    key={cIdx}
-                                    className="border border-gray-200 px-3 py-1 text-gray-600"
-                                  >
-                                    {typeof cell === "number"
-                                      ? cell.toLocaleString()
-                                      : String(cell)}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                  {/* All Data Tables - Display all tables from the response */}
+                  {tableCharts.length > 0 && (
+                    <div className="space-y-6">
+                      {tableCharts.map((tableChart, tableIdx) => {
+                        const isExecutiveReport = tableChart.category === "executive_report";
+                        const colorScheme = isExecutiveReport 
+                          ? { 
+                              border: "border-purple-200", 
+                              headerBg: "from-purple-100 to-purple-50",
+                              headerBorder: "border-purple-200",
+                              icon: "📈",
+                              iconBg: "bg-purple-500"
+                            }
+                          : { 
+                              border: "border-gray-200", 
+                              headerBg: "from-gray-100 to-gray-50",
+                              headerBorder: "border-gray-200",
+                              icon: "📊",
+                              iconBg: "bg-gray-500"
+                            };
+
+                        return (
+                          <div 
+                            key={`table-${tableIdx}`} 
+                            className={`bg-white rounded-2xl shadow-lg p-6 border-2 ${colorScheme.border}`}
+                          >
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className={`w-12 h-12 rounded-xl ${colorScheme.iconBg} flex items-center justify-center`}>
+                                <span className="text-2xl">{colorScheme.icon}</span>
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-800">
+                                  {tableChart.title || "Data Table"}
+                                </h3>
+                                {isExecutiveReport && (
+                                  <span className="text-xs text-purple-600 font-semibold bg-purple-50 px-2 py-1 rounded-full mt-1 inline-block">
+                                    Executive Report
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="overflow-x-auto custom-scrollbar">
+                              <table className="min-w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className={`bg-gradient-to-r ${colorScheme.headerBg}`}>
+                                    {tableChart.data.headers.map((h, i) => (
+                                      <th
+                                        key={i}
+                                        className={`border-2 ${colorScheme.headerBorder} px-3 py-2 text-left font-semibold text-gray-700 uppercase tracking-wide`}
+                                      >
+                                        {h}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {tableChart.data.rows.map((row, rIdx) => (
+                                    <tr
+                                      key={rIdx}
+                                      className={`transition-colors ${
+                                        rIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                      } hover:bg-${isExecutiveReport ? 'purple' : 'gray'}-100`}
+                                    >
+                                      {row.map((cell, cIdx) => {
+                                        // Special styling for priority/status columns
+                                        const isPriority = String(cell).toUpperCase() === "HIGH" || 
+                                                         String(cell).toUpperCase() === "MEDIUM" ||
+                                                         String(cell).toUpperCase() === "LOW";
+                                        const isStatus = String(cell) === "✓";
+                                        
+                                        let cellClass = "border border-gray-200 px-3 py-2 text-gray-600";
+                                        
+                                        if (isPriority) {
+                                          const priorityColors = {
+                                            HIGH: "bg-red-100 text-red-800 font-bold",
+                                            MEDIUM: "bg-yellow-100 text-yellow-800 font-bold",
+                                            LOW: "bg-green-100 text-green-800 font-bold"
+                                          };
+                                          cellClass += ` ${priorityColors[String(cell).toUpperCase()]}`;
+                                        } else if (isStatus) {
+                                          cellClass += " text-green-600 font-bold text-center text-lg";
+                                        }
+                                        
+                                        return (
+                                          <td
+                                            key={cIdx}
+                                            className={cellClass}
+                                          >
+                                            {typeof cell === "number"
+                                              ? cell.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                                              : String(cell)}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </>
