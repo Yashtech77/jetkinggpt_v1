@@ -28,7 +28,7 @@ const Sidebar = () => {
                 "/dashboard"
               )}`}
             >
-              <span>📊</span> <span>Dashboard</span>
+               <span>Dashboard</span>
             </Link>
           </li>
 
@@ -40,7 +40,7 @@ const Sidebar = () => {
                 "/upload-excel"
               )}`}
             >
-              <span>📂</span> <span className="text-black">Upload Excel</span>
+               <span >Upload Excel</span>
             </Link>
           </li>
 

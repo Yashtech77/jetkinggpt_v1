@@ -43,27 +43,26 @@ const UploadExcel = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header with Toggle */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Data Management</h2>
-            <p className="text-sm text-gray-600 mt-1">
+         <div className="w-full ">
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Data Management</h2>
+            <p className="text-xs text-gray-600 mt-0.9">
               Upload Excel files and explore analytics
             </p>
           </div>
-          
+        {/* Header with Toggle */}
+          <header className="flex flex-col items-center gap-4">
           {/* Toggle Button */}
-          <div className="relative flex w-full md:w-auto rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-1 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
+         <div className="relative flex w-full  rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-0.9 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
             {[
-              { id: "analytics", label: "📊 Analytics" },
-              { id: "upload", label: "📤 Upload Excel" },
+              { id: "analytics", label: " Analytics" },
+              { id: "upload", label: " Upload Excel" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 px-8 py-3 text-sm font-semibold rounded-xl transition-all duration-500 ease-out ${
+                className={`relative flex-1 px-7 py-2.7 text-xs font-semibold rounded-xl transition-all duration-500 ease-out ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-[#c7243b] to-[#a81c30] text-white shadow-lg shadow-[#c7243b]/30 scale-105 transform"
+                    ? "bg-gradient-to-r from-[#c7243b] to-[#a81c30] text-white shadow-lg shadow-[#c7243b]/30 scale-100 transform"
                     : "text-gray-600 hover:bg-white/60 hover:text-gray-900 hover:scale-102"
                 }`}
               >
@@ -78,6 +77,8 @@ const UploadExcel = () => {
               </button>
             ))}
           </div>
+          
+         
         </header>
 
         {/* CONTENT AREA */}

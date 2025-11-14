@@ -53,8 +53,8 @@ const Dashboard = () => {
         </header>
 
         {/* KPI Cards - Enhanced with hover effects */}
-        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl px-6 py-4 border-2 border-gray-100 hover:border-blue-200 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 ">
+          <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl px-6 py-4 border-2 border-gray-100 hover:border-blue-200 transition-all duration-300 cursor-pointer transform hover:-translate-y-1 ">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Students</p>
@@ -116,7 +116,7 @@ const Dashboard = () => {
         </section>
 
         {/* Toggle Button - More Prominent */}
-          <div className="flex w-full md:w-auto rounded-xl bg-white shadow-lg border-2 border-gray-200 p-1.5 hover:shadow-xl transition-shadow">
+          <div className="relative flex w-full md:w-auto rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-0.9 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
             {[
               { id: "analytics", label: "📊 Analytics" },
               { id: "assistant", label: "🤖 AI Assistant" },
@@ -126,7 +126,7 @@ const Dashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-500 ease-out  ${
                   activeTab === tab.id
-                    ? "bg-[#c7243b] text-white shadow-md scale-105"
+                    ? "bg-[#c7243b] text-white shadow-md scale-100"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
