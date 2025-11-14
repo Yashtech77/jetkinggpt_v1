@@ -6,15 +6,15 @@ const Sidebar = () => {
 
   const isActive = (path) =>
     pathname === path
-      ? "bg-[#c7243b] text-white shadow-sm"
+      ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-sm"
       : "text-black hover:bg-black/10";
 
   return (
     <aside className="h-screen w-60 bg-[#ffffff] text-black flex flex-col sticky top-0">
       {/* Logo */}
        <div className="flex items-center px-6 py-4 border-b border-black/10">
-          <img src="https://myai-aws-bucket.s3.ap-south-1.amazonaws.com/Jetking_Logo.png" alt="Logo" className="h-10 mr-2" />
-          <span className="font-bold text-lg">GPT</span>
+          {/* <img src="https://myai-aws-bucket.s3.ap-south-1.amazonaws.com/Jetking_Logo.png" alt="Logo" className="h-10 mr-2" /> */}
+          <span className="font-bold text-lg"> Jetking GPT</span>
         </div>
 
       <nav className="mt-4 flex-1">

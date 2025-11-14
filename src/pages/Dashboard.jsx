@@ -69,7 +69,7 @@ const Dashboard = () => {
             </span>
           </div>
 
-          <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl px-6 py-4 border-2 border-gray-100 hover:border-[#c7243b]/30 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+          <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl px-6 py-4 border-2 border-gray-100 hover:border-purple-500 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Fees Collected</p>
@@ -79,7 +79,7 @@ const Dashboard = () => {
                 <span className="text-2xl">💰</span>
               </div>
             </div>
-            <span className="inline-block mt-3 text-xs px-3 py-1.5 rounded-full bg-[#c7243b]/10 text-[#c7243b] font-medium border border-[#c7243b]/30">
+            <span className="inline-block mt-3 text-xs px-3 py-1.5 rounded-full bg-purple-200  text-purple-800 font-medium border border-purple-900">
               92% of target reached
             </span>
           </div>
@@ -126,7 +126,7 @@ const Dashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-500 ease-out  ${
                   activeTab === tab.id
-                    ? "bg-[#c7243b] text-white shadow-md scale-100"
+                    ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md scale-100"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
@@ -164,7 +164,7 @@ const Dashboard = () => {
                 {/* Batch B */}
                 <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div className="relative">
-                    <div className="w-16 rounded-t-xl bg-gradient-to-t from-green-600 to-green-400 h-28 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 border-2 border-green-300" />
+                    <div className="w-16 rounded-t-xl bg-gradient-to-r from-purple-500 to-blue-300 h-28 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 border-2 border-purple-300" />
                     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">
                       38 Students
                     </div>
@@ -176,7 +176,7 @@ const Dashboard = () => {
                 {/* Batch C */}
                 <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div className="relative">
-                    <div className="w-16 rounded-t-xl bg-gradient-to-t from-red-600 to-red-400 h-36 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 border-2 border-red-300" />
+                    <div className="w-16 rounded-t-xl bg-gradient-to-r from-purple-500 to-purple-700 h-36 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 border-2 border-purple-300" />
                     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">
                       52 Students
                     </div>

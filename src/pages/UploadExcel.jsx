@@ -367,9 +367,10 @@ const UploadExcel = () => {
     const total = data.values.reduce((sum, val) => sum + val, 0);
     
     const colors = [
+      "#8B5CF6",
       "#3B82F6", // blue
       "#10B981", // green
-      "#8B5CF6", // purple
+       // purple
       "#F59E0B", // amber
       "#EF4444", // red
       "#06B6D4", // cyan
@@ -740,7 +741,7 @@ const UploadExcel = () => {
               </div>
 
               {/* Upload Area */}
-              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-12 flex flex-col items-center justify-center text-center hover:border-[#c7243b] hover:bg-gray-50/50 transition-all duration-300 group mb-6">
+              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-12 flex flex-col items-center justify-center text-center hover:border-purple-500 hover:bg-gray-50/50 transition-all duration-300 group mb-6">
                 <input
                   type="file"
                   className="hidden"
@@ -751,7 +752,7 @@ const UploadExcel = () => {
 
                 <label
                   htmlFor="excelInput"
-                  className="px-8 py-3 bg-gradient-to-r from-[#c7243b] to-[#a81c30] text-white rounded-xl cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
+                  className="px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
                 >
                   📁 Choose File
                 </label>
@@ -807,15 +808,15 @@ const UploadExcel = () => {
           <header className="flex flex-col items-center gap-4">
             <div className="relative flex w-full max-w-2xl rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-1.5 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
               {[
-                { id: "analytics", label: "📊 Analytics" },
-                { id: "assistant", label: "🤖 Ask AI" },
+                { id: "analytics", label: " Analytics" },
+                { id: "assistant", label: " Ask AI" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex-1 px-12 py-4 text-sm font-semibold rounded-xl transition-all duration-500 ease-out min-w-[200px] ${
+                  className={`relative flex-1 px-12 py-4 text-l font-bold rounded-xl transition-all duration-500 ease-out min-w-[200px] ${
                     activeTab === tab.id
-                      ? "bg-gradient-to-r from-[#c7243b] to-[#a81c30] text-white shadow-lg shadow-[#c7243b]/30 scale-100 transform"
+                      ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg shadow-purple-300 scale-100 transform"
                       : "text-gray-600 hover:bg-white/60 hover:text-gray-900 hover:scale-105"
                   }`}
                 >
@@ -891,15 +892,15 @@ const UploadExcel = () => {
                     </div>
 
                     {/* Missing Values */}
-                    <div className="group bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100 hover:border-[#c7243b]/30 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="group bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100 hover:border-purple-600 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-2xl bg-[#c7243b]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <div className="w-16 h-16 rounded-2xl bg-purple-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <span className="text-3xl">⚠️</span>
                         </div>
                         <h4 className="text-lg font-bold text-gray-800 mb-2">
                           Missing Values
                         </h4>
-                        <p className="text-3xl font-bold text-[#c7243b] mb-2">
+                        <p className="text-3xl font-bold text-purple-800 mb-2">
                           {missingValues}
                         </p>
                         <p className="text-xs text-gray-500 text-center">
@@ -981,12 +982,13 @@ const UploadExcel = () => {
                               icon: "📈",
                               iconBg: "bg-purple-500"
                             }
-                          : { 
-                              border: "border-gray-200", 
-                              headerBg: "from-gray-100 to-gray-50",
-                              headerBorder: "border-gray-200",
+                          :  
+                            { 
+                              border: "border-purple-200", 
+                              headerBg: "from-purple-100 to-purple-50",
+                              headerBorder: "border-purple-200",
                               icon: "📊",
-                              iconBg: "bg-gray-500"
+                              iconBg: "bg-purple-500"
                             };
 
                         return (
@@ -1080,7 +1082,7 @@ const UploadExcel = () => {
             <section>
               <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c7243b] to-[#a81c30] flex items-center justify-center shadow-md">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-purple-700 flex items-center justify-center shadow-md">
                     <span className="text-2xl">🤖</span>
                   </div>
                   <div>
@@ -1115,7 +1117,7 @@ const UploadExcel = () => {
                         key={preset}
                         type="button"
                         onClick={() => setQuestion(preset)}
-                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-[#c7243b] hover:to-[#a81c30] hover:text-white font-medium border-2 border-gray-200 hover:border-[#c7243b] transition-all transform hover:scale-105 hover:shadow-md"
+                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-purple-400 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all transform hover:scale-105 hover:shadow-md"
                       >
                         {preset}
                       </button>
@@ -1127,7 +1129,7 @@ const UploadExcel = () => {
                 <div className="flex flex-col space-y-4">
                   <div className="relative">
                     <textarea
-                      className="w-full min-h-[120px] rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c7243b] focus:border-transparent resize-none bg-gray-50 hover:bg-white hover:border-gray-300 transition-all placeholder-gray-400"
+                      className="w-full min-h-[120px] rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-900 focus:border-transparent resize-none bg-gray-50 hover:bg-white hover:border-gray-300 transition-all placeholder-gray-400"
                       placeholder="e.g., Show me all students with pending fees over ₹500, or calculate total revenue by month..."
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
@@ -1141,7 +1143,7 @@ const UploadExcel = () => {
                     <button
                       onClick={handleAskQuestion}
                       disabled={loadingChat || !question.trim()}
-                      className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#c7243b] to-[#a81c30] text-white hover:from-[#a81c30] hover:to-[#8a1625] disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:hover:scale-100"
                     >
                       {loadingChat ? (
                         <>
