@@ -1169,94 +1169,95 @@ const Dashboard = () => {
     );
   }
 
-  // ---------- TABLE SELECTION VIEW ----------
-  if (!dashboardData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
-        <div className="max-w-6xl mx-auto">
-          <header className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-4 shadow-lg">
-              <Database className="text-white" size={32} />
-            </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">
-              Analytics Dashboard
-            </h2>
-            <p className="text-gray-600">
-              Select a table to generate AI-powered insights
-            </p>
-          </header>
-
-          {dashboardError && (
-            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
-              <AlertCircle className="text-red-500" size={20} />
-              <p className="text-red-700 text-sm">{dashboardError}</p>
-            </div>
-          )}
-
-          <div className="grid gap-6 md:grid-cols-2 mb-8">
-            {tables.map((table) => (
-              <button
-                key={table}
-                onClick={() => handleTableSelect(table)}
-                className={`group relative overflow-hidden rounded-2xl p-8 border-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
-                  tempSelectedTable === table
-                    ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-xl scale-105"
-                    : "border-gray-200 bg-white hover:border-purple-300 shadow-md"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-16 h-16 rounded-xl bg-gradient-to-br ${
-                      tableColors[table] || "from-purple-500 to-purple-700"
-                    } flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform`}
-                  >
-                    {tableIcons[table] || "📋"}
-                  </div>
-                  <div className="text-left flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1 capitalize">
-                      {table.replace(/_/g, " ")}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      View {table.replace(/_/g, " ")} analytics
-                    </p>
-                  </div>
-                  {tempSelectedTable === table && (
-                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                      <span className="text-white text-lg">✓</span>
-                    </div>
-                  )}
-                </div>
-              </button>
-            ))}
+// ---------- TABLE SELECTION VIEW ----------
+if (!dashboardData) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-3 shadow-md">
+            <Database className="text-white" size={24} />
           </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-1">
+            Analytics Dashboard
+          </h2>
+          <p className="text-sm text-gray-600">
+            Select a table to generate AI-powered insights
+          </p>
+        </header>
 
-          <div className="text-center">
+        {dashboardError && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+            <AlertCircle className="text-red-500" size={18} />
+            <p className="text-red-700 text-xs">{dashboardError}</p>
+          </div>
+        )}
+
+        <div className="grid gap-4 md:grid-cols-2 mb-6">
+          {tables.map((table) => (
             <button
-              onClick={handleGenerateDashboard}
-              disabled={!tempSelectedTable || loading}
-              className={`inline-flex items-center gap-3 px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg transform ${
-                tempSelectedTable && !loading
-                  ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-xl active:scale-95"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              key={table}
+              onClick={() => handleTableSelect(table)}
+              className={`group relative overflow-hidden rounded-xl p-4 border transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg ${
+                tempSelectedTable === table
+                  ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-md"
+                  : "border-gray-200 bg-white hover:border-purple-300 shadow-sm"
               }`}
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                  <span>Generating Dashboard...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={20} />
-                  <span>Generate Dashboard</span>
-                </>
-              )}
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-8 h-8 rounded-lg bg-gradient-to-br ${
+                    tableColors[table] || "from-purple-500 to-purple-700"
+                  } flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform`}
+                >
+                  {tableIcons[table] || "📋"}
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="text-base font-semibold text-gray-900 mb-0.5 capitalize">
+                    {table.replace(/_/g, " ")}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    View {table.replace(/_/g, " ")} analytics
+                  </p>
+                </div>
+                {tempSelectedTable === table && (
+                  <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+                    <span className="text-white text-sm">✓</span>
+                  </div>
+                )}
+              </div>
             </button>
-          </div>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <button
+            onClick={handleGenerateDashboard}
+            disabled={!tempSelectedTable || loading}
+            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md transform ${
+              tempSelectedTable && !loading
+                ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg active:scale-95"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
+            }`}
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} />
+                <span>Generate Dashboard</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   // ---------- DASHBOARD VIEW ----------
   return (
