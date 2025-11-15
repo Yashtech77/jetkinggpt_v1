@@ -48,28 +48,28 @@ export const dashboardService = {
   },
 
   // Ask AI assistant question
-  async askQuestion(question, tableName) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/ask`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          question, 
-          table_name: tableName 
-        }),
-      });
+async askQuestion(message, tableName) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        table_name: tableName,
+        message: message
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error asking question:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  },
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error asking question:', error);
+    throw error;
+  }
+}
+
 };
