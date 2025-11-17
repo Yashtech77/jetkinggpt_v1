@@ -727,27 +727,28 @@ import {
 } from "recharts";
 
 const tableIcons = {
-  users: "👥",
-  orders: "📦",
-  products: "🛍️",
-  sales: "💰",
-  customers: "👨‍💼",
-  inventory: "📊",
-  transactions: "💳",
-  employees: "👔",
   student_data: "🎓",
+  students: "🧑‍🎓",
+  enrollments: "📝",
+  centers: "🏫",
+  courses: "📚",
+  enrollment_status: "📌",
+  jetking_student_details: "🗂️",
+  payment_details: "💳",
+  merged_student_data: "🔀",
 };
 
+
 const tableColors = {
-  users: "from-purple-500 to-blue-500",
-  orders: "from-blue-500 to-cyan-500",
-  products: "from-cyan-500 to-teal-500",
-  sales: "from-purple-600 to-pink-500",
-  customers: "from-pink-500 to-rose-500",
-  inventory: "from-teal-500 to-green-500",
-  transactions: "from-orange-500 to-red-500",
-  employees: "from-indigo-500 to-purple-500",
   student_data: "from-purple-600 to-indigo-600",
+  students: "from-purple-600 to-indigo-600",
+  enrollments: "from-purple-600 to-indigo-600",
+  centers: "from-purple-600 to-indigo-600",
+  courses: "from-purple-600 to-indigo-600",
+  enrollment_status: "from-purple-600 to-indigo-600",
+  jetking_student_details: "from-purple-600 to-indigo-600",
+  payment_details: "from-purple-600 to-indigo-600",
+  merged_student_data: "from-purple-600 to-indigo-600",
 };
 
 const CHART_COLORS = [
