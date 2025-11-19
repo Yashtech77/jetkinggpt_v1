@@ -21,7 +21,7 @@ const Sidebar = ({ assistantOpen }) => {
 
   const isActive = (path) =>
     pathname === path
-      ? "bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md"
+      ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md"
       : "text-slate-700 hover:bg-slate-100";
 
   const navItems = [
@@ -46,7 +46,7 @@ const Sidebar = ({ assistantOpen }) => {
       {/* Header / Logo + Collapse Button */}
       <div className="flex items-center justify-between px-3 py-4 border-b border-slate-200">
         <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-semibold shadow-sm">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 flex items-center justify-center text-white font-semibold shadow-sm">
             J
           </div>
           {!collapsed && (
@@ -94,20 +94,6 @@ const Sidebar = ({ assistantOpen }) => {
           ))}
         </ul>
       </nav>
-
-      {/* Footer Hint (optional) */}
-      <div className="px-3 py-3 border-t border-slate-200 text-[11px] text-slate-500">
-        {!collapsed ? (
-          <p className="leading-snug">
-            Need help?{" "}
-            <span className="font-medium text-sky-600 cursor-pointer hover:underline">
-              Ask the AI assistant.
-            </span>
-          </p>
-        ) : (
-          <div className="text-center text-xs">v1.0</div>
-        )}
-      </div>
     </aside>
   );
 };
