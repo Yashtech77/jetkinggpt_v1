@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";import {
   Database,
   Sparkles,
+  Sparkle,
   BarChart3,
   MessageSquare,
+  BotMessageSquare,
   AlertCircle,
   TrendingUp,
   Table,
@@ -630,7 +632,7 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
 
         {dashboardData?.summary &&
           Object.keys(dashboardData.summary).length > 0 && (
-            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Object.entries(dashboardData.summary).map(([key, value]) => (
                 <div
                   key={key}
@@ -712,7 +714,7 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
   className="fixed top-6 right-6 z-40 p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95"
   title={isAIChatOpen ? "Close AI Assistant" : "Open AI Assistant"}
 >
-  {isAIChatOpen ? <X size={24} /> : <MessageSquare size={24} />}
+  {isAIChatOpen ? <X size={24} /> : <Sparkle size={24} />}
 </button>
 
       <div
@@ -725,13 +727,13 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                  <MessageSquare size={20} />
+                  <Sparkle size={20} />
                 </div>
                 <h3 className="text-xl font-bold">AI Assistant</h3>
               </div>
             </div>
             <p className="text-sm text-purple-100">
-              Ask questions about {selectedTable.replace(/_/g, " ")} data
+              Ask questions about {selectedTable.replace(/_/g, " ")}'s data
             </p>
           </div>
 
@@ -825,7 +827,7 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask a question about your data..."
-                rows={3}
+                rows={1}
                 disabled={aiLoading}
                 className="flex-1 px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               />
@@ -845,9 +847,9 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">
+            {/* <p className="text-xs text-gray-500 mt-2 text-center">
               Press Ctrl+Enter to send
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
