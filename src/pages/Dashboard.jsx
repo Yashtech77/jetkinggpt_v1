@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import {
+import React, { useState, useEffect } from "react";import {
   Database,
   Sparkles,
   BarChart3,
@@ -381,6 +380,13 @@ const ChartRenderer = ({ chart }) => {
 const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
   const dbDashboard = useDbDashboard();
 const aiAssistant = useAIAssistant();
+
+
+
+
+const [chatHistory, setChatHistory] = useState([]);
+const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
+
   const {
     tables = [],
     selectedTable = "",
@@ -429,23 +435,54 @@ const aiAssistant = useAIAssistant();
   };
 
   const handleReset = () => {
-    resetDashboard();
-    resetAssistant();
-    setTempSelectedTable("");
-    setIsAIChatOpen(false);
-  };
+  resetDashboard();
+  resetAssistant();
+  setTempSelectedTable("");
+  setIsAIChatOpen(false);
+  setChatHistory([]);
+  setLastAskedQuestion(null);
+};
 
-  const handleAskQuestion = () => {
-    if (question.trim() && selectedTable) {
-      askQuestion(question, selectedTable);
-    }
-  };
+
+ const handleAskQuestion = () => {
+  if (question.trim() && selectedTable) {
+    const q = question.trim();
+
+    // store what we actually asked
+    setLastAskedQuestion(q);
+
+    // fire the request
+    askQuestion(q, selectedTable);
+
+    // clear the text area
+    setQuestion("");
+  }
+};
+
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !aiLoading && question.trim()) {
       handleAskQuestion();
     }
   };
+
+  useEffect(() => {
+  if (!lastAskedQuestion) return;
+  if (!answer && !visualization) return;
+
+  setChatHistory((prev) => [
+    ...prev,
+    {
+      question: lastAskedQuestion,
+      answer,
+      visualization,
+    },
+  ]);
+
+  // So we only record this question once
+  setLastAskedQuestion(null);
+}, [answer, visualization, lastAskedQuestion]);
+  
 
   if (tablesLoading) {
     return (
@@ -700,52 +737,85 @@ const aiAssistant = useAIAssistant();
 
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {aiError && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
-                <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
-                <p className="text-red-700 text-sm">{aiError}</p>
-              </div>
-            )}
+  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+    <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
+    <p className="text-red-700 text-sm">{aiError}</p>
+  </div>
+)}
 
-            <div>
-              <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-                💭 Suggested Questions
-              </p>
-              <div className="flex flex-col gap-2">
-                {[
-                  `Show summary statistics`,
-                  `What are the key insights?`,
-                  `Analyze trends and patterns`,
-                ].map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setQuestion(preset)}
-                    disabled={aiLoading}
-                    className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {preset}
-                  </button>
-                ))}
-              </div>
-            </div>
+<div>
+  <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+    💭 Suggested Questions
+  </p>
+  <div className="flex flex-col gap-2">
+    {[
+      `Show summary statistics`,
+      `What are the key insights?`,
+      `Analyze trends and patterns`,
+    ].map((preset) => (
+      <button
+        key={preset}
+        type="button"
+        onClick={() => setQuestion(preset)}
+        disabled={aiLoading}
+        className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {preset}
+      </button>
+    ))}
+  </div>
+</div>
 
-            {answer && (
-              <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg">🤖</span>
-                  <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
-                </div>
-                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {answer}
-                </div>
-              </div>
-            )}
+{/* Chat history */}
+<div className="mt-4 space-y-4">
+  {chatHistory.map((item, idx) => (
+    <div key={idx} className="space-y-3">
+      {/* User question bubble */}
+      <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
+        <div className="flex items-start gap-2">
+          <span className="text-blue-500 mt-0.5">🧑‍💻</span>
+          <div>
+            <p className="text-xs font-semibold text-gray-500 mb-1">You</p>
+            <p className="text-sm text-gray-800 whitespace-pre-wrap">
+              {item.question}
+            </p>
+          </div>
+        </div>
+      </div>
 
-            {visualization && (
-              <div className="mt-4">
-                <ChartRenderer chart={visualization} />
-              </div>
-            )}
+      {/* AI answer bubble */}
+      {item.answer && (
+        <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">🤖</span>
+            <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
+          </div>
+          <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+            {item.answer}
+          </div>
+        </div>
+      )}
+
+      {/* Chart with its own scrollbars */}
+      {item.visualization && (
+        <div className="mt-2 max-h-80 overflow-auto rounded-xl border border-purple-100">
+          <ChartRenderer chart={item.visualization} />
+        </div>
+      )}
+    </div>
+  ))}
+
+  {/* Optional loading bubble */}
+  {aiLoading && (
+    <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
+        <p className="text-xs text-gray-500">Thinking about your question...</p>
+      </div>
+    </div>
+  )}
+</div>
+
           </div>
 
           <div className="p-4 border-t-2 border-gray-100 bg-gray-50">
