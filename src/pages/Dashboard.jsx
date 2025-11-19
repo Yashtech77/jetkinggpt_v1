@@ -543,7 +543,7 @@ const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
             </div>
           )}
 
-          <div className="grid gap-4 md:grid-cols-2 mb-6">
+          <div className="grid gap-4 md:grid-cols-3 mb-6">
             {tables.map((table) => (
               <button
                 key={table}

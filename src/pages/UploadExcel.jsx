@@ -194,9 +194,9 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
     },
     charts: [
       { gradient: "from-purple-600 to-purple-400", border: "border-purple-300", bg: "bg-purple-500" },
-      { gradient: "from-indigo-600 to-indigo-400", border: "border-indigo-300", bg: "bg-indigo-500" },
+      { gradient: "from-purple-600 to-purple-400", border: "border-purple-300", bg: "bg-purple-500" },
       { gradient: "from-violet-600 to-violet-400", border: "border-violet-300", bg: "bg-violet-500" },
-      { gradient: "from-fuchsia-600 to-fuchsia-400", border: "border-fuchsia-300", bg: "bg-fuchsia-500" },
+      { gradient: "from-violet-600 to-violet-400", border: "border-violet-300", bg: "bg-violet-500" },
     ],
     pieColors: [
       "#7c3aed", "#6366f1", "#8b5cf6", "#a855f7", 
