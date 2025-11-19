@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -6,6 +5,7 @@ import {
   Upload,
   ChevronLeft,
   ChevronRight,
+  Bot, // Imported BotMessageSquare
 } from "lucide-react";
 
 const Sidebar = ({ assistantOpen }) => {
@@ -47,7 +47,7 @@ const Sidebar = ({ assistantOpen }) => {
       <div className="flex items-center justify-between px-3 py-4 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 flex items-center justify-center text-white font-semibold shadow-sm">
-            J
+            <Bot className="w-6 h-6" /> {/* Replaced with BotMessageSquare icon */}
           </div>
           {!collapsed && (
             <span className="font-semibold text-sm leading-tight text-slate-900">

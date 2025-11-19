@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDashboard } from "../hooks/useDashboard";
 import { useChatAssistant } from "../hooks/useChatAssistant";
-import { MessageSquare, X, Send, Copy, Check } from "lucide-react";
+import { MessageSquare, X, Send, Copy, Check,TrendingUp , BotMessageSquare,Sparkle} from "lucide-react";
 
 const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
   const [isAIChatOpen, setIsAIChatOpen] = useState(isAssistantOpen || false);
@@ -380,9 +380,9 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-4 border-b border-purple-100">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-          <span className="text-xs text-purple-600 bg-purple-100 px-3 py-1 rounded-full font-semibold">
+          {/* <span className="text-xs text-purple-600 bg-purple-100 px-3 py-1 rounded-full font-semibold">
             Live Data
-          </span>
+          </span> */}
         </div>
       </div>
       <div className="p-6">
@@ -669,8 +669,8 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' ');
       
-      const icons = ['📊', '💯', '⚠️', '📈', '🎯', '💰', '👥', '📋'];
-      const icon = icons[idx % icons.length];
+      
+      const icon = <TrendingUp size={18} className="text-purple-600 group-hover:text-indigo-700 transition-colors" />;
       
       return (
         <div key={key} className="group bg-white rounded-xl shadow-md p-6 border border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -690,7 +690,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
     });
 
     return (
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {metrics}
       </div>
     );
@@ -777,7 +777,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
           className="fixed top-6 right-6 z-40 p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95"
           title={isAssistantOpen ? "Close AI Assistant" : "Open AI Assistant"}
         >
-          {isAssistantOpen ? <X size={24} /> : <MessageSquare size={24} />}
+          {isAssistantOpen ? <X size={24} /> : <Sparkle size={24} />}
         </button>
       )}
 
@@ -794,7 +794,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                    <MessageSquare size={20} />
+                    <Sparkle size={20} />
                   </div>
                   <h3 className="text-xl font-bold">AI Assistant</h3>
                 </div>
@@ -895,7 +895,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                         <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-4 shadow-inner">
                           <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-purple-100">
                             <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center shadow-sm">
-                              <span className="text-lg">📊</span>
+                              <span className="text-lg"><TrendingUp/></span>
                             </div>
                             <div>
                               <span className="font-bold text-gray-800 text-sm block">
@@ -975,7 +975,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Ask a question about your data..."
-                  rows={3}
+                  rows={1}
                   disabled={loadingChat}
                   className="flex-1 px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 />
@@ -995,9 +995,9 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-2 text-center">
+              {/* <p className="text-xs text-gray-500 mt-2 text-center">
                 Press Ctrl+Enter to send
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
