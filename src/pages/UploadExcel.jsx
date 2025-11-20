@@ -391,49 +391,56 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
     </div>
   );
 
-  // ---------- VERTICAL BAR CHART ----------
-  const renderVerticalBarChart = (chart, colorIdx = 0) => {
-    if (!chart) return null;
-    const { title, data } = chart;
-    const heights = normalizeBars(data.values);
-    const colors = purpleTheme.charts[colorIdx % purpleTheme.charts.length];
+  // ---------- VERTICAL BAR CHART (scrollable) ----------
+const renderVerticalBarChart = (chart, colorIdx = 0) => {
+  if (!chart) return null;
+  const { title, data } = chart;
+  const heights = normalizeBars(data.values);
+  const colors = purpleTheme.charts[colorIdx % purpleTheme.charts.length];
 
-    return (
-      <ChartContainer title={title}>
-        <div className="h-80 overflow-x-auto overflow-y-visible custom-scrollbar">
-          <div className="flex items-end justify-around h-64 min-w-max px-4" style={{ minWidth: `${Math.max(data.labels.length * 80, 400)}px` }}>
-            {data.labels.map((label, idx) => {
-              const value = data.values[idx];
-              const height = heights[idx];
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center gap-2 group cursor-pointer"
-                  style={{ minWidth: '70px' }}
-                >
-                  <div className="relative">
-                    <div
-                      className={`w-12 rounded-t-lg bg-gradient-to-t ${colors.gradient} group-hover:scale-105 transition-all duration-300 border ${colors.border} shadow-md`}
-                      style={{ height: `${height}px` }}
-                    />
-                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap z-10 shadow-xl">
-                      {typeof value === 'number' ? value.toLocaleString() : value}
-                    </div>
+  return (
+    <ChartContainer title={title}>
+      {/* keep chart width stable and scroll horizontally if needed */}
+      <div className="h-80 overflow-x-auto overflow-y-visible custom-scrollbar">
+        <div
+          className="flex items-end justify-around h-64 min-w-max px-4"
+          style={{
+            minWidth: `${Math.max(data.labels.length * 80, 650)}px`,
+          }}
+        >
+          {data.labels.map((label, idx) => {
+            const value = data.values[idx];
+            const height = heights[idx];
+            return (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-2 group cursor-pointer"
+                style={{ minWidth: "70px" }}
+              >
+                <div className="relative">
+                  <div
+                    className={`w-12 rounded-t-lg bg-gradient-to-t ${colors.gradient} group-hover:scale-105 transition-all duration-300 border ${colors.border} shadow-md`}
+                    style={{ height: `${height}px` }}
+                  />
+                  {/* value tooltip */}
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap z-10 shadow-xl">
+                    {typeof value === "number" ? value.toLocaleString() : value}
                   </div>
-                  <span className="text-xs font-medium text-gray-600 text-center max-w-[80px] break-words">
-                    {label}
-                  </span>
-                  <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-full">
-                    {typeof value === 'number' ? value.toLocaleString() : value}
-                  </span>
                 </div>
-              );
-            })}
-          </div>
+                <span className="text-xs font-medium text-gray-600 text-center max-w-[80px] break-words">
+                  {label}
+                </span>
+                <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-full">
+                  {typeof value === "number" ? value.toLocaleString() : value}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      </ChartContainer>
-    );
-  };
+      </div>
+    </ChartContainer>
+  );
+};
 
   // ---------- HORIZONTAL BAR CHART ----------
   const renderHorizontalBarChart = (chart, colorIdx = 0) => {
@@ -477,92 +484,55 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
     );
   };
 
-  // ---------- PIE/DONUT CHART ----------
-  const renderPieChart = (chart) => {
-    if (!chart) return null;
-    const { title, data } = chart;
-    const total = data.values.reduce((sum, val) => sum + val, 0);
+ // ---------- PIE / STATUS SUMMARY (progress bars instead of donut) ----------
+const renderPieChart = (chart) => {
+  if (!chart) return null;
+  const { title, data } = chart;
 
-    let currentAngle = -90;
-    const slices = data.labels.map((label, idx) => {
-      const value = data.values[idx];
-      const percentage = total > 0 ? (value / total) * 100 : 0;
-      const angle = (percentage / 100) * 360;
-      const startAngle = currentAngle;
-      currentAngle += angle;
-      
-      return {
-        label,
-        value,
-        percentage,
-        startAngle,
-        endAngle: currentAngle,
-        color: purpleTheme.pieColors[idx % purpleTheme.pieColors.length],
-      };
-    });
+  if (!Array.isArray(data.labels) || !Array.isArray(data.values)) return null;
 
-    return (
-      <ChartContainer title={title}>
-        <div className="h-80 overflow-y-auto custom-scrollbar">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            <div className="relative w-56 h-56 flex-shrink-0">
-              <svg viewBox="0 0 200 200" className="transform -rotate-90">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#f5f3ff" strokeWidth="40" />
-                {slices.map((slice, idx) => {
-                  const startAngle = (slice.startAngle * Math.PI) / 180;
-                  const endAngle = (slice.endAngle * Math.PI) / 180;
-                  const x1 = 100 + 80 * Math.cos(startAngle);
-                  const y1 = 100 + 80 * Math.sin(startAngle);
-                  const x2 = 100 + 80 * Math.cos(endAngle);
-                  const y2 = 100 + 80 * Math.sin(endAngle);
-                  const largeArc = slice.endAngle - slice.startAngle > 180 ? 1 : 0;
-                  const pathData = `M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                  
-                  return (
-                    <path
-                      key={idx}
-                      d={pathData}
-                      fill={slice.color}
-                      className="hover:opacity-80 transition-opacity cursor-pointer"
-                      stroke="white"
-                      strokeWidth="2"
-                    />
-                  );
-                })}
-                <circle cx="100" cy="100" r="50" fill="white" />
-              </svg>
-              
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-purple-700">{total.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500">Total</p>
-                </div>
+  let rows = data.labels
+    .map((label, idx) => ({
+      name: String(label),
+      value: Number(data.values[idx]) || 0,
+    }))
+    .filter((item) => item.value > 0);
+
+  if (!rows.length) return null;
+
+  const total = rows.reduce((sum, r) => sum + r.value, 0) || 1;
+
+  return (
+    <ChartContainer title={title || "Status Summary"}>
+      <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+        {rows.map((row, idx) => {
+          const pct = (row.value / total) * 100;
+          return (
+            <div key={idx}>
+              <div className="flex justify-between text-xs font-medium text-gray-700 mb-1">
+                <span className="truncate pr-2">{row.name}</span>
+                <span>{pct.toFixed(1)}%</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-purple-100 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%` }}
+                />
               </div>
             </div>
+          );
+        })}
+      </div>
 
-            <div className="space-y-3 max-h-56 overflow-y-auto custom-scrollbar pr-2">
-              {slices.map((slice, idx) => (
-                <div key={idx} className="flex items-center gap-3 group cursor-pointer">
-                  <div
-                    className="w-4 h-4 rounded-full group-hover:scale-125 transition-transform flex-shrink-0 shadow-sm"
-                    style={{ backgroundColor: slice.color }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 truncate" title={slice.label}>
-                      {slice.label}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {slice.value.toLocaleString()} ({slice.percentage.toFixed(1)}%)
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </ChartContainer>
-    );
-  };
+      <p className="mt-4 text-xs text-gray-500">
+        Total records:{" "}
+        <span className="font-semibold">
+          {total.toLocaleString()}
+        </span>
+      </p>
+    </ChartContainer>
+  );
+};
 
   // ---------- LINE CHART ----------
   const renderLineChart = (chart) => {
