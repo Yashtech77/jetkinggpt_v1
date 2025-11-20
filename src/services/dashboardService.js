@@ -1,11 +1,11 @@
 // services/dashboardService.js
-const API_BASE_URL = 'https://jetlytics.tjdem.online/api/db';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const dashboardService = {
   // Fetch all available tables
   async getTables() {
     try {
-      const response = await fetch(`${API_BASE_URL}/tables`, {
+      const response = await fetch(`${API_BASE_URL}/db/tables`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export const dashboardService = {
   // Generate dashboard for a specific table
   async generateDashboard(tableName) {
     try {
-      const response = await fetch(`${API_BASE_URL}/dashboard`, {
+      const response = await fetch(`${API_BASE_URL}/db/dashboard`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const dashboardService = {
   // Ask AI assistant question
 async askQuestion(message, tableName) {
   try {
-    const response = await fetch(`${API_BASE_URL}/chat`, {
+    const response = await fetch(`${API_BASE_URL}/db/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
