@@ -71,139 +71,149 @@ const ChartRenderer = ({ chart }) => {
   if (!chart || !chart.type || !chart.data) return null;
 
   if (chart.type === "bar") {
-    try {
-      const hasLabelsAndValues =
-        Array.isArray(chart.data.labels) && Array.isArray(chart.data.values);
-      if (!hasLabelsAndValues) return null;
+  try {
+    const hasLabelsAndValues =
+      Array.isArray(chart.data.labels) && Array.isArray(chart.data.values);
+    if (!hasLabelsAndValues) return null;
 
-      const chartData = chart.data.labels.map((label, idx) => ({
-        name:
-          typeof label === "string" && label.length > 25
-            ? label.substring(0, 25) + "..."
-            : String(label),
-        value: Number(chart.data.values[idx]) || 0,
-        fullName: String(label),
-      }));
+    const chartData = chart.data.labels.map((label, idx) => ({
+      name:
+        typeof label === "string" && label.length > 25
+          ? label.substring(0, 25) + "..."
+          : String(label),
+      value: Number(chart.data.values[idx]) || 0,
+      fullName: String(label),
+    }));
 
-      return (
-        <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
-          <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <BarChart3 size={20} className="text-purple-600" />
-            {chart.title || "Bar Chart"}
-          </h4>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 80 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis
-                dataKey="name"
-                angle={-45}
-                textAnchor="end"
-                height={100}
-                interval={0}
-                tick={{ fontSize: 10, fill: "#6b7280" }}
-              />
-              <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "2px solid #a855f7",
-                  borderRadius: "8px",
-                  padding: "10px",
-                }}
-                formatter={(value) => [
-                  typeof value === "number"
-                    ? value.toLocaleString()
-                    : String(value),
-                  chart.data.y_label || "Value",
-                ]}
-                labelFormatter={(label) =>
-                  chartData.find((d) => d.name === label)?.fullName || label
-                }
-              />
-              <Bar
-                dataKey="value"
-                fill="url(#purpleGradient)"
-                radius={[8, 8, 0, 0]}
-              />
-              <defs>
-                <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#a855f7" />
-                </linearGradient>
-              </defs>
-            </BarChart>
-          </ResponsiveContainer>
+    if (!chartData.length) return null;
+
+    return (
+      <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
+        <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <BarChart3 size={20} className="text-purple-600" />
+          {chart.title || "Bar Chart"}
+        </h4>
+
+        {/* 🔹 Scrollable container so chart never gets crushed */}
+        <div className="w-full overflow-x-auto">
+          <div className="min-w-[650px] h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 80 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="name"
+                  angle={-30}
+                  textAnchor="end"
+                  height={70}
+                  interval={0}
+                  tick={{ fontSize: 10, fill: "#6b7280" }}
+                />
+                <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    border: "2px solid #a855f7",
+                    borderRadius: "8px",
+                    padding: "10px",
+                  }}
+                  formatter={(value) => [
+                    typeof value === "number"
+                      ? value.toLocaleString()
+                      : String(value),
+                    chart.data.y_label || "Value",
+                  ]}
+                  labelFormatter={(label) =>
+                    chartData.find((d) => d.name === label)?.fullName || label
+                  }
+                />
+                <Bar
+                  dataKey="value"
+                  fill="url(#purpleGradient)"
+                  radius={[8, 8, 0, 0]}
+                />
+                <defs>
+                  <linearGradient
+                    id="purpleGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#8b5cf6" />
+                    <stop offset="100%" stopColor="#a855f7" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      );
-    } catch (error) {
-      console.error("Error rendering bar chart:", error);
-      return null;
-    }
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering bar chart:", error);
+    return null;
   }
+}
+
 
   if (chart.type === "pie") {
-    try {
-      const hasLabelsAndValues =
-        Array.isArray(chart.data.labels) && Array.isArray(chart.data.values);
-      if (!hasLabelsAndValues) return null;
+  try {
+    const hasLabelsAndValues =
+      Array.isArray(chart.data.labels) && Array.isArray(chart.data.values);
+    if (!hasLabelsAndValues) return null;
 
-      const chartData = chart.data.labels
-        .map((label, idx) => ({
-          name: String(label),
-          value: Number(chart.data.values[idx]) || 0,
-        }))
-        .filter((item) => item.value > 0);
+    let rows = chart.data.labels
+      .map((label, idx) => ({
+        name: String(label),
+        value: Number(chart.data.values[idx]) || 0,
+      }))
+      .filter((item) => item.value > 0);
 
-      if (!chartData.length) return null;
+    if (!rows.length) return null;
 
-      return (
-        <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
-          <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="text-purple-600">📊</span>
-            {chart.title || "Pie Chart"}
-          </h4>
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                labelLine
-                label={({ name, percent }) =>
-                  `${name}: ${(percent * 100).toFixed(1)}%`
-                }
-                outerRadius={100}
-                fill="#8b5cf6"
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={CHART_COLORS[index % CHART_COLORS.length]}
+    const total = rows.reduce((s, r) => s + r.value, 0) || 1;
+
+    return (
+      <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
+        <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span className="text-purple-600">📊</span>
+          {chart.title || "Status Summary"}
+        </h4>
+
+        {/* 🔹 Simple, responsive list with progress bars */}
+        <div className="space-y-3">
+          {rows.map((row) => {
+            const pct = (row.value / total) * 100;
+            return (
+              <div key={row.name}>
+                <div className="flex justify-between text-xs font-medium text-gray-700 mb-1">
+                  <span className="truncate pr-2">{row.name}</span>
+                  <span>{pct.toFixed(1)}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-purple-100 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-purple-700"
+                    style={{ width: `${pct}%` }}
                   />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value) => [
-                  typeof value === "number"
-                    ? value.toLocaleString()
-                    : String(value),
-                  "Count",
-                ]}
-              />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      );
-    } catch (error) {
-      console.error("Error rendering pie chart:", error);
-      return null;
-    }
+
+        <p className="mt-4 text-xs text-gray-500">
+          Total students: <span className="font-semibold">{total}</span>
+        </p>
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering status summary:", error);
+    return null;
   }
+}
 
   if (chart.type === "line") {
     try {
