@@ -1,3 +1,6 @@
+ 
+
+
 // import React, { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 // import { useDashboard } from "../hooks/useDashboard";
@@ -10,11 +13,9 @@
 //   const [file, setFile] = useState(null);
 //   const [showModal, setShowModal] = useState(true);
 //   const [fileUploaded, setFileUploaded] = useState(false);
-//   // const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 //   const [question, setQuestion] = useState("");
 //   const [copied, setCopied] = useState(false);
 
-//    // ✅ ADD THESE:
 //   const [chatHistory, setChatHistory] = useState([]);
 //   const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
 
@@ -32,32 +33,53 @@
 //   const {
 //     answer,
 //     table,
+//     visualization, // ✅ ADD THIS - for charts from AI
 //     loadingChat,
 //     chatError,
 //     askQuestion,
 //     setAnswer,
 //   } = useChatAssistant();
 
-//     // ✅ Build chat history when a new answer/table arrives
+//   // ✅ Build chat history when a new answer/table/visualization arrives
 //   useEffect(() => {
 //     if (!lastAskedQuestion) return;
-//     if (!answer && !table) return;
+//     if (!answer && !table && !visualization) return;
 
-//     setChatHistory((prev) => [
-//       ...prev,
-//       {
-//         question: lastAskedQuestion,
-//         answer,
-//         table,
-//       },
-//     ]);
+//     // Update the loading item with actual response
+//     setChatHistory((prev) => {
+//       const lastIndex = prev.findIndex(
+//         (item) => item.question === lastAskedQuestion && item.isLoading
+//       );
+      
+//       if (lastIndex !== -1) {
+//         const updated = [...prev];
+//         updated[lastIndex] = {
+//           question: lastAskedQuestion,
+//           answer,
+//           table,
+//           visualization,
+//           isLoading: false,
+//         };
+//         return updated;
+//       }
+      
+//       // Fallback: if no loading item found, add as new
+//       return [
+//         ...prev,
+//         {
+//           question: lastAskedQuestion,
+//           answer,
+//           table,
+//           visualization,
+//           isLoading: false,
+//         },
+//       ];
+//     });
 
-//     // prevent duplicate pushes
 //     setLastAskedQuestion(null);
-//   }, [answer, table, lastAskedQuestion]);
+//   }, [answer, table, visualization, lastAskedQuestion]);
 
-
-//    // Load file info from localStorage on mount
+//   // Load file info from localStorage on mount
 //   useEffect(() => {
 //     const storedFileId = localStorage.getItem('uploadedFileId');
 //     const storedFileName = localStorage.getItem('uploadedFileName');
@@ -78,14 +100,13 @@
  
 //   // Clear localStorage when component unmounts or user navigates away
 //   useEffect(() => {
-//     // Cleanup function that runs when component unmounts
 //     return () => {
 //       localStorage.removeItem('uploadedFileId');
 //       localStorage.removeItem('uploadedFileName');
 //     };
 //   }, []);
  
-//   // Also clear localStorage when user leaves the page (browser back, close, refresh)
+//   // Also clear localStorage when user leaves the page
 //   useEffect(() => {
 //     const handleBeforeUnload = () => {
 //       localStorage.removeItem('uploadedFileId');
@@ -116,11 +137,10 @@
 //     navigate("/dashboard");
 //   };
 
-//     const handleAskQuestion = async () => {
+//   const handleAskQuestion = async () => {
 //     const trimmed = question.trim();
 //     if (!trimmed) return;
     
-//     // Get fileId from state or localStorage
 //     const currentFileId = fileId || localStorage.getItem('uploadedFileId');
     
 //     if (!currentFileId) {
@@ -128,23 +148,31 @@
 //       return;
 //     }
 
-//     // ✅ Remember what we asked
+//     // ✅ Immediately add question to chat history with loading state
+//     setChatHistory((prev) => [
+//       ...prev,
+//       {
+//         question: trimmed,
+//         answer: null,
+//         table: null,
+//         visualization: null,
+//         isLoading: true,
+//       },
+//     ]);
+
 //     setLastAskedQuestion(trimmed);
-
-//     // Clear current visible answer before new one
 //     setAnswer("");
-    
-//     // ✅ Clear the textarea immediately
-//     setQuestion("");
+//     setQuestion(""); // Clear textarea immediately
 
-//     // Ask the backend
 //     await askQuestion(trimmed, currentFileId);
 //   };
 
 //   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !loadingChat && question.trim()) {
+//     if (e.key === 'Enter' && !e.shiftKey && !loadingChat && question.trim()) {
+//       e.preventDefault(); // Prevent default new line behavior
 //       handleAskQuestion();
 //     }
+//     // Shift+Enter will still create a new line
 //   };
 
 //   const handleCopyResponse = () => {
@@ -159,23 +187,21 @@
 //   };
 
 //   const toggleAIChat = () => {
-//   setIsAIChatOpen((prev) => {
-//     const next = !prev;
+//     setIsAIChatOpen((prev) => !prev);
+//   };
 
-//     // Inform App.jsx so Sidebar can react
-//     if (setIsAssistantOpen) setIsAssistantOpen(next);
-
-//     return next;
-//   });
-// };
-
+//   // Sync isAIChatOpen with parent's isAssistantOpen
+//   useEffect(() => {
+//     if (setIsAssistantOpen) {
+//       setIsAssistantOpen(isAIChatOpen);
+//     }
+//   }, [isAIChatOpen, setIsAssistantOpen]);
 
 //   // ---------- CHART MAPPING ----------
 //   const charts = dashboard?.charts || [];
 //   const summary = dashboard?.summary || null;
 //   const insights = dashboard?.insights || [];
 
-//   // Categorize charts by type
 //   const barCharts = charts.filter((c) => c.type === "bar");
 //   const pieCharts = charts.filter((c) => c.type === "pie");
 //   const lineCharts = charts.filter((c) => c.type === "line");
@@ -184,7 +210,6 @@
 //     c.title.toLowerCase().includes("paid amount by source"))));
 //   const tableCharts = charts.filter((c) => c.type === "table");
 
-//   // Professional purple color palette
 //   const purpleTheme = {
 //     primary: {
 //       gradient: "from-purple-600 via-purple-500 to-indigo-600",
@@ -212,7 +237,6 @@
 //     return values.map((v) => (v / max) * maxHeight + 10);
 //   };
 
-//   // Format AI response for better readability
 //   const formatAIResponse = (text) => {
 //     if (!text) return null;
     
@@ -310,7 +334,6 @@
 //     });
 //   };
 
-//   // Add custom styles for scrollbars
 //   React.useEffect(() => {
 //     const style = document.createElement('style');
 //     style.textContent = `
@@ -334,7 +357,6 @@
 //     return () => document.head.removeChild(style);
 //   }, []);
 
-//   // Format date labels
 //   const formatDateLabel = (label) => {
 //     if (!label) return '';
     
@@ -374,15 +396,281 @@
 //     }
 //   };
 
+//   // ✅ NEW - Mini Chart Renderer for AI Chat
+//   const renderMiniChart = (chart) => {
+//     console.log('🎨 renderMiniChart called with:', chart); // DEBUG
+    
+//     if (!chart || !chart.type) {
+//       console.log('❌ No chart or no chart.type'); // DEBUG
+//       return null;
+//     }
+
+//     console.log('✅ Chart type:', chart.type); // DEBUG
+
+//     // Bar Chart - improved for scrolling
+//     if (chart.type === "bar" && chart.data?.labels && chart.data?.values) {
+//       console.log('📊 Rendering bar chart'); // DEBUG
+//       const heights = normalizeBars(chart.data.values, 100);
+//       const barWidth = Math.max(40, Math.min(80, 300 / chart.data.labels.length));
+      
+//       return (
+//         <div className="bg-white rounded-lg p-4 border-2 border-purple-200">
+//           <h5 className="text-xs font-bold text-gray-800 mb-3">{chart.title || "Bar Chart"}</h5>
+//           <div className="overflow-x-auto custom-scrollbar">
+//             <div 
+//               className="flex items-end justify-start h-32 gap-2" 
+//               style={{ minWidth: `${chart.data.labels.length * barWidth}px` }}
+//             >
+//               {chart.data.labels.map((label, idx) => {
+//                 const value = chart.data.values[idx];
+//                 const height = heights[idx];
+//                 return (
+//                   <div 
+//                     key={idx} 
+//                     className="flex flex-col items-center gap-1"
+//                     style={{ minWidth: `${barWidth - 8}px` }}
+//                   >
+//                     <div
+//                       className="w-full rounded-t bg-gradient-to-t from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 transition-colors"
+//                       style={{ height: `${height}px`, minHeight: '10px' }}
+//                       title={`${label}: ${typeof value === 'number' ? value.toLocaleString() : value}`}
+//                     />
+//                     <span className="text-[9px] text-gray-600 truncate w-full text-center" title={label}>
+//                       {label.length > 8 ? label.substring(0, 8) + '...' : label}
+//                     </span>
+//                     <span className="text-[9px] font-bold text-purple-700">
+//                       {typeof value === 'number' ? value.toLocaleString() : value}
+//                     </span>
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           </div>
+//         </div>
+//       );
+//     }
+
+//     // Pie Chart
+//     if (chart.type === "pie" && chart.data?.labels && chart.data?.values) {
+//       const total = chart.data.values.reduce((sum, val) => sum + val, 0);
+//       return (
+//         <div className="bg-white rounded-lg p-4 border-2 border-purple-200">
+//           <h5 className="text-xs font-bold text-gray-800 mb-3">{chart.title || "Pie Chart"}</h5>
+//           <div className="space-y-2">
+//             {chart.data.labels.map((label, idx) => {
+//               const value = chart.data.values[idx];
+//               const percentage = total > 0 ? (value / total) * 100 : 0;
+//               return (
+//                 <div key={idx}>
+//                   <div className="flex justify-between text-[10px] font-medium text-gray-700 mb-1">
+//                     <span className="truncate pr-2">{label}</span>
+//                     <span>{percentage.toFixed(1)}%</span>
+//                   </div>
+//                   <div className="h-1.5 rounded-full bg-purple-100 overflow-hidden">
+//                     <div
+//                       className="h-full bg-gradient-to-r from-purple-500 to-purple-700"
+//                       style={{ width: `${percentage}%` }}
+//                     />
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       );
+//     }
+
+//     // Line Chart - improved for better visibility
+//     if (chart.type === "line" && chart.data?.labels && chart.data?.values) {
+//       console.log('📈 Rendering line chart:', {
+//         title: chart.title,
+//         points: chart.data.values.length,
+//         values: chart.data.values,
+//         labels: chart.data.labels
+//       });
+      
+//       const max = Math.max(...chart.data.values);
+//       const min = Math.min(...chart.data.values);
+//       const range = max - min || 1;
+      
+//       // Format date labels
+//       const formatLabel = (label) => {
+//         try {
+//           if (label.includes('T')) {
+//             return label.split('T')[0].slice(5); // Get MM-DD
+//           }
+//           return label;
+//         } catch {
+//           return label;
+//         }
+//       };
+      
+//       const chartWidth = Math.max(350, chart.data.values.length * 20);
+//       const chartHeight = 180;
+//       const padding = { left: 50, right: 20, top: 20, bottom: 45 };
+      
+//       const points = chart.data.values.map((value, idx) => {
+//         const x = padding.left + (idx / (chart.data.values.length - 1)) * (chartWidth - padding.left - padding.right);
+//         const y = padding.top + (chartHeight - padding.top - padding.bottom) - ((value - min) / range) * (chartHeight - padding.top - padding.bottom);
+//         return { x, y, value, label: chart.data.labels[idx] };
+//       });
+      
+//       const pathData = points.map((p, i) => 
+//         `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
+//       ).join(' ');
+      
+//       // Area fill path
+//       const areaPath = `${pathData} L ${points[points.length - 1].x} ${chartHeight - padding.bottom} L ${padding.left} ${chartHeight - padding.bottom} Z`;
+
+//       return (
+//         <div className="bg-white rounded-lg p-4 border-2 border-purple-200 overflow-hidden mt-3">
+//           <h5 className="text-xs font-bold text-gray-800 mb-3 flex items-center gap-2">
+//             <span className="text-purple-600">📈</span>
+//             {chart.title || "Line Chart"}
+//           </h5>
+//           <div className="overflow-x-auto custom-scrollbar" style={{ maxHeight: '220px' }}>
+//             <svg 
+//               viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+//               className="w-full"
+//               style={{ minWidth: `${chartWidth}px`, height: '180px' }}
+//             >
+//               {/* Grid lines */}
+//               {[0, 1, 2, 3, 4].map((i) => {
+//                 const y = padding.top + (i / 4) * (chartHeight - padding.top - padding.bottom);
+//                 const value = max - (i / 4) * range;
+//                 return (
+//                   <g key={i}>
+//                     <line 
+//                       x1={padding.left} 
+//                       y1={y} 
+//                       x2={chartWidth - padding.right} 
+//                       y2={y} 
+//                       stroke="#f3f4f6" 
+//                       strokeWidth="1" 
+//                     />
+//                     <text 
+//                       x={padding.left - 5} 
+//                       y={y + 3} 
+//                       textAnchor="end" 
+//                       className="text-[8px] fill-gray-500"
+//                     >
+//                       {value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+//                     </text>
+//                   </g>
+//                 );
+//               })}
+              
+//               {/* Area fill */}
+//               <path 
+//                 d={areaPath} 
+//                 fill="url(#miniAreaGradient)" 
+//                 opacity="0.2"
+//               />
+              
+//               {/* Line */}
+//               <path 
+//                 d={pathData} 
+//                 fill="none" 
+//                 stroke="#7c3aed" 
+//                 strokeWidth="3"
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//               />
+              
+//               {/* Points */}
+//               {points.map((p, idx) => {
+//                 // Show labels for first, last, and every nth point to avoid crowding
+//                 const showLabel = idx === 0 || idx === points.length - 1 || idx % Math.ceil(points.length / 5) === 0;
+                
+//                 return (
+//                   <g key={idx}>
+//                     <circle 
+//                       cx={p.x} 
+//                       cy={p.y} 
+//                       r="4" 
+//                       fill="white"
+//                       stroke="#7c3aed"
+//                       strokeWidth="2"
+//                     >
+//                       <title>{`${formatLabel(p.label)}: ${p.value.toLocaleString()}`}</title>
+//                     </circle>
+                    
+//                     {showLabel && (
+//                       <text
+//                         x={p.x}
+//                         y={chartHeight - padding.bottom + 15}
+//                         textAnchor="middle"
+//                         className="text-[8px] fill-gray-600"
+//                         transform={`rotate(-45 ${p.x} ${chartHeight - padding.bottom + 15})`}
+//                       >
+//                         {idx + 1}
+//                       </text>
+//                     )}
+//                   </g>
+//                 );
+//               })}
+              
+//               {/* Axes */}
+//               <line 
+//                 x1={padding.left} 
+//                 y1={padding.top} 
+//                 x2={padding.left} 
+//                 y2={chartHeight - padding.bottom} 
+//                 stroke="#9ca3af" 
+//                 strokeWidth="1.5"
+//               />
+//               <line 
+//                 x1={padding.left} 
+//                 y1={chartHeight - padding.bottom} 
+//                 x2={chartWidth - padding.right} 
+//                 y2={chartHeight - padding.bottom} 
+//                 stroke="#9ca3af" 
+//                 strokeWidth="1.5"
+//               />
+              
+//               <defs>
+//                 <linearGradient id="miniAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+//                   <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.6" />
+//                   <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+//                 </linearGradient>
+//               </defs>
+//             </svg>
+//           </div>
+          
+//           {/* Value range info */}
+//           <div className="flex justify-between mt-3 pt-2 border-t border-purple-100 text-[10px]">
+//             <div>
+//               <span className="text-gray-500">Min: </span>
+//               <span className="font-bold text-purple-700">{min.toLocaleString()}</span>
+//             </div>
+//             <div>
+//               <span className="text-gray-500">Max: </span>
+//               <span className="font-bold text-purple-700">{max.toLocaleString()}</span>
+//             </div>
+//             <div>
+//               <span className="text-gray-500">Avg: </span>
+//               <span className="font-bold text-purple-700">
+//                 {(chart.data.values.reduce((a, b) => a + b, 0) / chart.data.values.length).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+//               </span>
+//             </div>
+//             <div>
+//               <span className="text-gray-500">Points: </span>
+//               <span className="font-bold text-gray-700">{chart.data.values.length}</span>
+//             </div>
+//           </div>
+//         </div>
+//       );
+//     }
+
+//     return null;
+//   };
+
 //   // ---------- STANDARDIZED CHART CONTAINER ----------
 //   const ChartContainer = ({ title, children, fullWidth = false }) => (
 //     <div className={`bg-white rounded-xl shadow-lg border border-purple-100 overflow-hidden ${fullWidth ? 'col-span-full' : ''}`}>
 //       <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-4 border-b border-purple-100">
 //         <div className="flex items-center justify-between">
 //           <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-//           {/* <span className="text-xs text-purple-600 bg-purple-100 px-3 py-1 rounded-full font-semibold">
-//             Live Data
-//           </span> */}
 //         </div>
 //       </div>
 //       <div className="p-6">
@@ -669,7 +957,6 @@
 //         word.charAt(0).toUpperCase() + word.slice(1)
 //       ).join(' ');
       
-      
 //       const icon = <TrendingUp size={18} className="text-purple-600 group-hover:text-indigo-700 transition-colors" />;
       
 //       return (
@@ -770,22 +1057,22 @@
 //         </div>
 //       )}
 
-//       {/* AI Assistant Toggle Button - Fixed Position */}
+//       {/* AI Assistant Toggle Button */}
 //       {fileUploaded && !showModal && (
 //         <button
-//           onClick={() => setIsAssistantOpen((prev) => !prev)}
+//           onClick={toggleAIChat}
 //           className="fixed top-6 right-6 z-40 p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95"
-//           title={isAssistantOpen ? "Close AI Assistant" : "Open AI Assistant"}
+//           title={isAIChatOpen ? "Close AI Assistant" : "Open AI Assistant"}
 //         >
-//           {isAssistantOpen ? <X size={24} /> : <Sparkle size={24} />}
+//           {isAIChatOpen ? <X size={24} /> : <Sparkle size={24} />}
 //         </button>
 //       )}
 
-//       {/* Sliding AI Chat Panel - Fixed Position */}
+//       {/* Sliding AI Chat Panel */}
 //       {fileUploaded && !showModal && (
 //         <div
 //           className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-30 border-l-2 border-purple-100 ${
-//             isAssistantOpen ? "translate-x-0" : "translate-x-full"
+//             isAIChatOpen ? "translate-x-0" : "translate-x-full"
 //           }`}
 //         >
 //           <div className="h-full flex flex-col">
@@ -838,115 +1125,126 @@
 //                 </div>
 //               </div>
 
-//                             {/* Chat History: questions + answers (+ tables) */}
+//               {/* ✅ UPDATED Chat History */}
 //               {chatHistory.length > 0 && (
 //                 <div className="space-y-4">
 //                   {chatHistory.map((item, idx) => (
 //                     <div key={idx} className="space-y-3">
-//                       {/* User question */}
-//                       <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
-//                         <div className="flex items-start gap-2">
-//                           <span className="text-blue-500 mt-0.5">🧑‍💻</span>
-//                           <div>
-//                             <p className="text-xs font-semibold text-gray-500 mb-1">
-//                               You
-//                             </p>
-//                             <p className="text-sm text-gray-800 whitespace-pre-wrap">
-//                               {item.question}
-//                             </p>
-//                           </div>
-//                         </div>
+//                       {/* User question bubble */}
+//                       <div className="rounded-xl bg-blue-50 border-2 border-blue-200 p-4 shadow-sm">
+//                         <p className="text-sm text-gray-800 whitespace-pre-wrap font-medium">
+//                           {item.question}
+//                         </p>
 //                       </div>
 
-//                       {/* AI answer */}
-//                       {item.answer && (
-//                         <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
-//                           <div className="flex items-center justify-between gap-2 mb-3">
-//                             <div className="flex items-center gap-2">
-//                               <span className="text-lg">🤖</span>
-//                               <h4 className="text-sm font-bold text-gray-900">
-//                                 AI Response
-//                               </h4>
-//                             </div>
-
-//                             {/* Copy only for latest answer */}
-//                             {idx === chatHistory.length - 1 && (
-//                               <button
-//                                 onClick={handleCopyResponse}
-//                                 className="p-1.5 rounded-lg hover:bg-purple-100 transition-all"
-//                                 title="Copy to clipboard"
-//                               >
-//                                 {copied ? (
-//                                   <Check size={16} className="text-green-600" />
-//                                 ) : (
-//                                   <Copy size={16} className="text-gray-600" />
-//                                 )}
-//                               </button>
-//                             )}
-//                           </div>
-//                           <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                             {formatAIResponse(item.answer)}
+//                       {/* Show loading state while processing */}
+//                       {item.isLoading ? (
+//                         <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
+//                           <div className="flex items-center gap-3">
+//                             <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
+//                             <p className="text-xs text-gray-500">AI is thinking...</p>
 //                           </div>
 //                         </div>
-//                       )}
+//                       ) : (
+//                         <>
+//                           {/* AI answer */}
+//                           {item.answer && (
+//                             <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
+//                               <div className="flex items-center justify-between gap-2 mb-3">
+//                                 <div className="flex items-center gap-2">
+//                                   <span className="text-lg">🤖</span>
+//                                   <h4 className="text-sm font-bold text-gray-900">
+//                                     AI Response
+//                                   </h4>
+//                                 </div>
 
-//                       {/* Result table for this answer, if any */}
-//                       {item.table && item.table.type === "dataframe" && (
-//                         <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-4 shadow-inner">
-//                           <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-purple-100">
-//                             <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center shadow-sm">
-//                               <span className="text-lg"><TrendingUp/></span>
-//                             </div>
-//                             <div>
-//                               <span className="font-bold text-gray-800 text-sm block">
-//                                 Data Results
-//                               </span>
-//                               <span className="text-xs text-gray-500">
-//                                 {item.table.shape?.[0]} rows ×{" "}
-//                                 {item.table.shape?.[1] || item.table.columns.length} columns
-//                               </span>
-//                             </div>
-//                           </div>
-//                           <div className="max-h-64 overflow-auto custom-scrollbar">
-//                             <table className="min-w-full text-xs border-collapse">
-//                               <thead className="sticky top-0 z-10">
-//                                 <tr className="bg-gradient-to-r from-purple-100 to-indigo-100">
-//                                   {item.table.columns.map((col, colIdx) => (
-//                                     <th
-//                                       key={colIdx}
-//                                       className="border-2 border-purple-200 px-3 py-2 text-left font-bold text-gray-800 uppercase tracking-wide whitespace-nowrap"
-//                                     >
-//                                       {col}
-//                                     </th>
-//                                   ))}
-//                                 </tr>
-//                               </thead>
-//                               <tbody>
-//                                 {item.table.rows.map((row, rIdx) => (
-//                                   <tr
-//                                     key={rIdx}
-//                                     className={`transition-colors hover:bg-purple-50 ${
-//                                       rIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
-//                                     }`}
+//                                 {idx === chatHistory.length - 1 && (
+//                                   <button
+//                                     onClick={handleCopyResponse}
+//                                     className="p-1.5 rounded-lg hover:bg-purple-100 transition-all"
+//                                     title="Copy to clipboard"
 //                                   >
-//                                     {row.map((cell, cIdx) => (
-//                                       <td
-//                                         key={cIdx}
-//                                         className="border border-purple-200 px-3 py-2 text-gray-700 whitespace-nowrap"
+//                                     {copied ? (
+//                                       <Check size={16} className="text-green-600" />
+//                                     ) : (
+//                                       <Copy size={16} className="text-gray-600" />
+//                                     )}
+//                                   </button>
+//                                 )}
+//                               </div>
+//                               <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+//                                 {formatAIResponse(item.answer)}
+//                               </div>
+//                             </div>
+//                           )}
+
+//                           {/* ✅ NEW - Visualization (Charts) */}
+//                           {item.visualization && (
+//                             <div className="mt-2">
+//                               {console.log('🎯 About to render visualization:', item.visualization)}
+//                               {renderMiniChart(item.visualization)}
+//                             </div>
+//                           )}
+
+//                           {/* Result table */}
+//                           {item.table && item.table.type === "dataframe" && (
+//                             <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-4 shadow-inner">
+//                               <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-purple-100">
+//                                 <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center shadow-sm">
+//                                   <span className="text-lg"><TrendingUp/></span>
+//                                 </div>
+//                                 <div>
+//                                   <span className="font-bold text-gray-800 text-sm block">
+//                                     Data Results
+//                                   </span>
+//                                   <span className="text-xs text-gray-500">
+//                                     {item.table.shape?.[0]} rows ×{" "}
+//                                     {item.table.shape?.[1] || item.table.columns.length} columns
+//                                   </span>
+//                                 </div>
+//                               </div>
+//                               <div className="max-h-64 overflow-auto custom-scrollbar">
+//                                 <table className="min-w-full text-xs border-collapse">
+//                                   <thead className="sticky top-0 z-10">
+//                                     <tr className="bg-gradient-to-r from-purple-100 to-indigo-100">
+//                                       {item.table.columns.map((col, colIdx) => (
+//                                         <th
+//                                           key={colIdx}
+//                                           className="border-2 border-purple-200 px-3 py-2 text-left font-bold text-gray-800 uppercase tracking-wide whitespace-nowrap"
+//                                         >
+//                                           {col}
+//                                         </th>
+//                                       ))}
+//                                     </tr>
+//                                   </thead>
+//                                   <tbody>
+//                                     {item.table.rows.map((row, rIdx) => (
+//                                       <tr
+//                                         key={rIdx}
+//                                         className={`transition-colors hover:bg-purple-50 ${
+//                                           rIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
+//                                         }`}
 //                                       >
-//                                         {typeof cell === "number"
-//                                           ? cell.toLocaleString(undefined, {
-//                                               maximumFractionDigits: 2,
-//                                             })
-//                                           : String(cell)}
-//                                       </td>
+//                                         {row.map((cell, cIdx) => (
+//                                           <td
+//                                             key={cIdx}
+//                                             className="border border-purple-200 px-3 py-2 text-gray-700 whitespace-nowrap"
+//                                           >
+//                                             {typeof cell === "number"
+//                                               ? cell.toLocaleString(undefined, {
+//                                                   maximumFractionDigits: 2,
+//                                                 })
+//                                               : String(cell)}
+//                                           </td>
+//                                         ))}
+//                                       </tr>
 //                                     ))}
-//                                   </tr>
-//                                 ))}
-//                               </tbody>
-//                             </table>
-//                           </div>
-//                         </div>
+//                                   </tbody>
+//                                 </table>
+//                               </div>
+//                             </div>
+//                           )}
+//                         </>
 //                       )}
 //                     </div>
 //                   ))}
@@ -964,7 +1262,6 @@
 //                   </p>
 //                 </div>
 //               )}
-
 //             </div>
 
 //             {/* Input Area */}
@@ -995,9 +1292,9 @@
 //                   )}
 //                 </button>
 //               </div>
-//               {/* <p className="text-xs text-gray-500 mt-2 text-center">
-//                 Press Ctrl+Enter to send
-//               </p> */}
+//               <p className="text-xs text-gray-500 mt-2 text-center">
+//                 Press <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-xs">Enter</kbd> to send • <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-xs">Shift+Enter</kbd> for new line
+//               </p>
 //             </div>
 //           </div>
 //         </div>
@@ -1007,7 +1304,7 @@
 //       {!showModal && (
 //         <div 
 //           className={`transition-all duration-300 ease-in-out ${
-//             isAssistantOpen ? 'mr-96' : 'mr-0'
+//             isAIChatOpen ? 'mr-96' : 'mr-0'
 //           }`}
 //         >
 //           <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-8">
@@ -1040,10 +1337,8 @@
 
 //               {dashboard && (
 //                 <>
-//                   {/* Summary Metrics - Dynamic */}
 //                   {renderSummaryMetrics()}
 
-//                   {/* Insights Banner - Dynamic */}
 //                   {insights.length > 0 && (
 //                     <div className="bg-gradient-to-r from-purple-50 via-white to-indigo-50 rounded-xl shadow-md p-6 border border-purple-200">
 //                       <div className="flex items-start gap-4">
@@ -1064,23 +1359,19 @@
 //                     </div>
 //                   )}
 
-//                   {/* All Charts in Grid - 2 columns, standardized size */}
 //                   <div className="grid gap-6 md:grid-cols-2">
-//                     {/* Vertical Bar Charts */}
 //                     {barCharts.map((chart, idx) => (
 //                       <React.Fragment key={`bar-${idx}`}>
 //                         {renderVerticalBarChart(chart, idx)}
 //                       </React.Fragment>
 //                     ))}
                     
-//                     {/* Pie Charts */}
 //                     {pieCharts.map((chart, idx) => (
 //                       <React.Fragment key={`pie-${idx}`}>
 //                         {renderPieChart(chart)}
 //                       </React.Fragment>
 //                     ))}
 
-//                     {/* Horizontal Bar Charts */}
 //                     {horizontalBarCharts.map((chart, idx) => (
 //                       <React.Fragment key={`hbar-${idx}`}>
 //                         {renderHorizontalBarChart(chart, idx)}
@@ -1088,14 +1379,12 @@
 //                     ))}
 //                   </div>
 
-//                   {/* Line Charts - Full Width */}
 //                   {lineCharts.map((chart, idx) => (
 //                     <React.Fragment key={`line-${idx}`}>
 //                       {renderLineChart(chart)}
 //                     </React.Fragment>
 //                   ))}
 
-//                   {/* Data Tables */}
 //                   {tableCharts.length > 0 && (
 //                     <div className="space-y-6">
 //                       {tableCharts.map((tableChart, tableIdx) => {
@@ -1188,7 +1477,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDashboard } from "../hooks/useDashboard";
 import { useChatAssistant } from "../hooks/useChatAssistant";
-import { MessageSquare, X, Send, Copy, Check,TrendingUp , BotMessageSquare,Sparkle} from "lucide-react";
+import { MessageSquare, X, Send, Copy, Check, TrendingUp, BotMessageSquare, Sparkle, ArrowDown } from "lucide-react";
 
 const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
   const [isAIChatOpen, setIsAIChatOpen] = useState(isAssistantOpen || false);
@@ -1201,6 +1490,8 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
 
   const [chatHistory, setChatHistory] = useState([]);
   const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const chatContainerRef = React.useRef(null);
 
   const navigate = useNavigate();
 
@@ -1222,6 +1513,32 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
     askQuestion,
     setAnswer,
   } = useChatAssistant();
+
+  // ✅ Scroll to bottom handler
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // ✅ Handle scroll event to show/hide scroll button
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom);
+    }
+  };
+
+  // ✅ Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatHistory.length > 0 && !showScrollButton) {
+      scrollToBottom();
+    }
+  }, [chatHistory]);
 
   // ✅ Build chat history when a new answer/table/visualization arrives
   useEffect(() => {
@@ -2274,8 +2591,12 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
               </p>
             </div>
 
-            {/* Chat Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+            {/* Chat Content with ref and scroll handler */}
+            <div 
+              ref={chatContainerRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar relative"
+            >
               {chatError && (
                 <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
                   <span className="text-red-500 text-xl">⚠️</span>
@@ -2308,7 +2629,7 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                 </div>
               </div>
 
-              {/* ✅ UPDATED Chat History */}
+              {/* ✅ Chat History */}
               {chatHistory.length > 0 && (
                 <div className="space-y-4">
                   {chatHistory.map((item, idx) => (
@@ -2361,10 +2682,9 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                             </div>
                           )}
 
-                          {/* ✅ NEW - Visualization (Charts) */}
+                          {/* ✅ Visualization (Charts) */}
                           {item.visualization && (
                             <div className="mt-2">
-                              {console.log('🎯 About to render visualization:', item.visualization)}
                               {renderMiniChart(item.visualization)}
                             </div>
                           )}
@@ -2444,6 +2764,17 @@ const UploadExcel = ({ isAssistantOpen, setIsAssistantOpen }) => {
                     Your AI response will appear here...
                   </p>
                 </div>
+              )}
+
+              {/* ✅ Scroll to Bottom Button */}
+              {showScrollButton && (
+                <button
+                  onClick={scrollToBottom}
+                  className="fixed bottom-24 right-[20rem] z-50 p-3 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 animate-bounce"
+                  title="Scroll to bottom"
+                >
+                  <ArrowDown size={20} />
+                </button>
               )}
             </div>
 

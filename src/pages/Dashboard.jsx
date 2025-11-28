@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from "react";
 // import {
 //   Database,
@@ -451,6 +450,19 @@
 //   const handleAskQuestion = () => {
 //     if (question.trim() && selectedTable) {
 //       const q = question.trim();
+      
+//       // Immediately add question to chat history with loading state
+//       setChatHistory((prev) => [
+//         ...prev,
+//         {
+//           question: q,
+//           answer: null,
+//           visualization: null,
+//           resultData: null,
+//           isLoading: true, // Flag to show loading state
+//         },
+//       ]);
+      
 //       setLastAskedQuestion(q);
 //       askQuestion(q, selectedTable);
 //       setQuestion("");
@@ -458,27 +470,50 @@
 //   };
 
 //   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !aiLoading && question.trim()) {
+//     if (e.key === 'Enter' && !e.shiftKey && !aiLoading && question.trim()) {
+//       e.preventDefault(); // Prevent default new line behavior
 //       handleAskQuestion();
 //     }
+//     // Shift+Enter will still create a new line (default behavior)
 //   };
 
 //   useEffect(() => {
 //     if (!lastAskedQuestion) return;
-//     if (!answer && !visualization && !resultData) return; // ✅ Include resultData
+//     if (!answer && !visualization && !resultData) return;
 
-//     setChatHistory((prev) => [
-//       ...prev,
-//       {
-//         question: lastAskedQuestion,
-//         answer,
-//         visualization,
-//         resultData, // ✅ ADD THIS
-//       },
-//     ]);
+//     // Update the loading item with actual response
+//     setChatHistory((prev) => {
+//       const lastIndex = prev.findIndex(
+//         (item) => item.question === lastAskedQuestion && item.isLoading
+//       );
+      
+//       if (lastIndex !== -1) {
+//         const updated = [...prev];
+//         updated[lastIndex] = {
+//           question: lastAskedQuestion,
+//           answer,
+//           visualization,
+//           resultData,
+//           isLoading: false,
+//         };
+//         return updated;
+//       }
+      
+//       // Fallback: if no loading item found, add as new
+//       return [
+//         ...prev,
+//         {
+//           question: lastAskedQuestion,
+//           answer,
+//           visualization,
+//           resultData,
+//           isLoading: false,
+//         },
+//       ];
+//     });
 
 //     setLastAskedQuestion(null);
-//   }, [answer, visualization, resultData, lastAskedQuestion]); // ✅ Add resultData
+//   }, [answer, visualization, resultData, lastAskedQuestion]);
 
 //   if (tablesLoading) {
 //     return (
@@ -768,98 +803,94 @@
 //               {chatHistory.map((item, idx) => (
 //                 <div key={idx} className="space-y-3">
 //                   {/* User question bubble */}
-//                   <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
-//                     <div className="flex items-start gap-2">
-//                       <span className="text-blue-500 mt-0.5">🧑‍💻</span>
-//                       <div>
-//                         <p className="text-xs font-semibold text-gray-500 mb-1">You</p>
-//                         <p className="text-sm text-gray-800 whitespace-pre-wrap">
-//                           {item.question}
-//                         </p>
-//                       </div>
-//                     </div>
+//                   <div className="rounded-xl bg-blue-50 border-2 border-blue-200 p-4 shadow-sm">
+//                     <p className="text-sm text-gray-800 whitespace-pre-wrap font-medium">
+//                       {item.question}
+//                     </p>
 //                   </div>
 
-//                   {/* AI answer bubble */}
-//                   {item.answer && (
-//                     <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
-//                       <div className="flex items-center gap-2 mb-3">
-//                         <span className="text-lg">🤖</span>
-//                         <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
-//                       </div>
-//                       <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                         {item.answer}
+//                   {/* Show loading state while processing */}
+//                   {item.isLoading ? (
+//                     <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
+//                       <div className="flex items-center gap-3">
+//                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
+//                         <p className="text-xs text-gray-500">AI is thinking...</p>
 //                       </div>
 //                     </div>
-//                   )}
+//                   ) : (
+//                     <>
+//                       {/* AI answer bubble */}
+//                       {item.answer && (
+//                         <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
+//                           <div className="flex items-center gap-2 mb-3">
+                          
+//                             <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
+//                           </div>
+//                           <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+//                             {item.answer}
+//                           </div>
+//                         </div>
+//                       )}
 
-//                   {/* ✅ NEW - Data Table Display */}
-//                   {item.resultData && item.resultData.records && item.resultData.records.length > 0 && (
-//                     <div className="rounded-xl bg-white border-2 border-purple-200 overflow-hidden shadow-sm">
-//                       <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-2">
-//                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
-//                           <span>📊</span>
-//                           Data Results ({item.resultData.totalRows} rows)
-//                         </h4>
-//                       </div>
-//                       <div className="max-h-96 overflow-auto">
-//                         <table className="w-full text-xs">
-//                           <thead className="sticky top-0 bg-purple-100 border-b-2 border-purple-200">
-//                             <tr>
-//                               {item.resultData.columns.map((col, colIdx) => (
-//                                 <th
-//                                   key={colIdx}
-//                                   className="px-3 py-2 text-left font-semibold text-purple-900 uppercase tracking-wide whitespace-nowrap"
-//                                 >
-//                                   {String(col).replace(/_/g, " ")}
-//                                 </th>
-//                               ))}
-//                             </tr>
-//                           </thead>
-//                           <tbody>
-//                             {item.resultData.records.map((row, rowIdx) => (
-//                               <tr
-//                                 key={rowIdx}
-//                                 className={`border-b border-gray-100 hover:bg-purple-50 transition-colors ${
-//                                   rowIdx % 2 === 0 ? "bg-gray-50" : "bg-white"
-//                                 }`}
-//                               >
-//                                 {item.resultData.columns.map((col, colIdx) => (
-//                                   <td
-//                                     key={colIdx}
-//                                     className="px-3 py-2 text-gray-700 whitespace-nowrap"
+//                       {/* ✅ NEW - Data Table Display */}
+//                       {item.resultData && item.resultData.records && item.resultData.records.length > 0 && (
+//                         <div className="rounded-xl bg-white border-2 border-purple-200 overflow-hidden shadow-sm">
+//                           <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-2">
+//                             <h4 className="text-sm font-bold text-white flex items-center gap-2">
+//                               <span>📊</span>
+//                               Data Results ({item.resultData.totalRows} rows)
+//                             </h4>
+//                           </div>
+//                           <div className="max-h-96 overflow-auto">
+//                             <table className="w-full text-xs">
+//                               <thead className="sticky top-0 bg-purple-100 border-b-2 border-purple-200">
+//                                 <tr>
+//                                   {item.resultData.columns.map((col, colIdx) => (
+//                                     <th
+//                                       key={colIdx}
+//                                       className="px-3 py-2 text-left font-semibold text-purple-900 uppercase tracking-wide whitespace-nowrap"
+//                                     >
+//                                       {String(col).replace(/_/g, " ")}
+//                                     </th>
+//                                   ))}
+//                                 </tr>
+//                               </thead>
+//                               <tbody>
+//                                 {item.resultData.records.map((row, rowIdx) => (
+//                                   <tr
+//                                     key={rowIdx}
+//                                     className={`border-b border-gray-100 hover:bg-purple-50 transition-colors ${
+//                                       rowIdx % 2 === 0 ? "bg-gray-50" : "bg-white"
+//                                     }`}
 //                                   >
-//                                     {row[col] !== null && row[col] !== undefined
-//                                       ? String(row[col])
-//                                       : "—"}
-//                                   </td>
+//                                     {item.resultData.columns.map((col, colIdx) => (
+//                                       <td
+//                                         key={colIdx}
+//                                         className="px-3 py-2 text-gray-700 whitespace-nowrap"
+//                                       >
+//                                         {row[col] !== null && row[col] !== undefined
+//                                           ? String(row[col])
+//                                           : "—"}
+//                                       </td>
+//                                     ))}
+//                                   </tr>
 //                                 ))}
-//                               </tr>
-//                             ))}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </div>
-//                   )}
+//                               </tbody>
+//                             </table>
+//                           </div>
+//                         </div>
+//                       )}
 
-//                   {/* Chart with its own scrollbars */}
-//                   {item.visualization && (
-//                     <div className="mt-2 max-h-80 overflow-auto rounded-xl border border-purple-100">
-//                       <ChartRenderer chart={item.visualization} />
-//                     </div>
+//                       {/* Chart with its own scrollbars */}
+//                       {item.visualization && (
+//                         <div className="mt-2 max-h-80 overflow-auto rounded-xl border border-purple-100">
+//                           <ChartRenderer chart={item.visualization} />
+//                         </div>
+//                       )}
+//                     </>
 //                   )}
 //                 </div>
 //               ))}
-
-//               {/* Loading bubble */}
-//               {aiLoading && (
-//                 <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
-//                   <div className="flex items-center gap-3">
-//                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
-//                     <p className="text-xs text-gray-500">Thinking about your question...</p>
-//                   </div>
-//                 </div>
-//               )}
 //             </div>
 //           </div>
 
@@ -899,7 +930,8 @@
 
 // export default Dashboard;
 
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import {
   Database,
   Sparkles,
@@ -912,6 +944,7 @@ import {
   Table,
   X,
   Send,
+  ArrowDown,
 } from "lucide-react";
 
 import { useDbDashboard } from "../hooks/useDbDashboard";
@@ -1294,6 +1327,11 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
 
   const [chatHistory, setChatHistory] = useState([]);
   const [lastAskedQuestion, setLastAskedQuestion] = useState(null);
+  
+  // ✅ NEW - Scroll management states and refs
+  const chatContainerRef = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true);
 
   const {
     tables = [],
@@ -1310,7 +1348,7 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
     question = "",
     setQuestion = () => {},
     answer = null,
-    resultData = null, // ✅ ADD THIS
+    resultData = null,
     visualization = null,
     loading: aiLoading = false,
     error: aiError = null,
@@ -1320,6 +1358,46 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
 
   const [tempSelectedTable, setTempSelectedTable] = useState("");
   const [isAIChatOpen, setIsAIChatOpen] = useState(isAssistantOpen || false);
+
+  // ✅ NEW - Scroll detection handler
+  const handleScroll = () => {
+    if (!chatContainerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const scrolledFromBottom = scrollHeight - scrollTop - clientHeight;
+    
+    // Show button if scrolled more than 100px from bottom
+    const shouldShow = scrolledFromBottom > 100;
+    setShowScrollButton(shouldShow);
+    
+    // Disable auto-scroll if user scrolls up
+    if (shouldShow) {
+      setIsAutoScrollEnabled(false);
+    } else {
+      setIsAutoScrollEnabled(true);
+    }
+  };
+
+  // ✅ NEW - Smooth scroll to bottom function
+  const scrollToBottom = (smooth = true) => {
+    if (!chatContainerRef.current) return;
+    
+    chatContainerRef.current.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+    
+    setIsAutoScrollEnabled(true);
+    setShowScrollButton(false);
+  };
+
+  // ✅ NEW - Auto-scroll when new messages arrive
+  useEffect(() => {
+    if (isAutoScrollEnabled && chatHistory.length > 0) {
+      // Small delay to ensure DOM has updated
+      setTimeout(() => scrollToBottom(true), 100);
+    }
+  }, [chatHistory, isAutoScrollEnabled]);
 
   const toggleAIChat = () => {
     setIsAIChatOpen((prev) => {
@@ -1360,22 +1438,24 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
           answer: null,
           visualization: null,
           resultData: null,
-          isLoading: true, // Flag to show loading state
+          isLoading: true,
         },
       ]);
       
       setLastAskedQuestion(q);
       askQuestion(q, selectedTable);
       setQuestion("");
+      
+      // ✅ Enable auto-scroll when sending new question
+      setIsAutoScrollEnabled(true);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !aiLoading && question.trim()) {
-      e.preventDefault(); // Prevent default new line behavior
+      e.preventDefault();
       handleAskQuestion();
     }
-    // Shift+Enter will still create a new line (default behavior)
   };
 
   useEffect(() => {
@@ -1400,7 +1480,6 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
         return updated;
       }
       
-      // Fallback: if no loading item found, add as new
       return [
         ...prev,
         {
@@ -1668,7 +1747,12 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* ✅ UPDATED - Chat container with scroll detection */}
+          <div 
+            ref={chatContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto p-6 space-y-4 relative"
+          >
             {aiError && (
               <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
                 <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
@@ -1699,18 +1783,16 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
               </div>
             </div>
 
-            {/* ✅ UPDATED Chat history */}
+            {/* Chat history */}
             <div className="mt-4 space-y-4">
               {chatHistory.map((item, idx) => (
                 <div key={idx} className="space-y-3">
-                  {/* User question bubble */}
                   <div className="rounded-xl bg-blue-50 border-2 border-blue-200 p-4 shadow-sm">
                     <p className="text-sm text-gray-800 whitespace-pre-wrap font-medium">
                       {item.question}
                     </p>
                   </div>
 
-                  {/* Show loading state while processing */}
                   {item.isLoading ? (
                     <div className="rounded-xl bg-white border-2 border-gray-200 p-4 shadow-sm">
                       <div className="flex items-center gap-3">
@@ -1720,11 +1802,9 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
                     </div>
                   ) : (
                     <>
-                      {/* AI answer bubble */}
                       {item.answer && (
                         <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
                           <div className="flex items-center gap-2 mb-3">
-                          
                             <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
                           </div>
                           <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -1733,7 +1813,6 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
                         </div>
                       )}
 
-                      {/* ✅ NEW - Data Table Display */}
                       {item.resultData && item.resultData.records && item.resultData.records.length > 0 && (
                         <div className="rounded-xl bg-white border-2 border-purple-200 overflow-hidden shadow-sm">
                           <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-2">
@@ -1782,7 +1861,6 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
                         </div>
                       )}
 
-                      {/* Chart with its own scrollbars */}
                       {item.visualization && (
                         <div className="mt-2 max-h-80 overflow-auto rounded-xl border border-purple-100">
                           <ChartRenderer chart={item.visualization} />
@@ -1793,6 +1871,17 @@ const Dashboard = ({ isAssistantOpen, setIsAssistantOpen }) => {
                 </div>
               ))}
             </div>
+
+            {/* ✅ NEW - Scroll to Bottom Button */}
+            {showScrollButton && (
+               <button
+                               onClick={scrollToBottom}
+                               className="fixed bottom-24 right-[20rem] z-50 p-3 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 animate-bounce"
+                               title="Scroll to bottom"
+                             >
+                               <ArrowDown size={20} />
+                             </button>
+            )}
           </div>
 
           <div className="p-4 border-t-2 border-gray-100 bg-gray-50">
